@@ -50,11 +50,13 @@ function extractWords(text) {
   return names;
 }
 const players = ref([]);
-const text = ref(localStorage.getItem('player')||'');
 const select = ref([]);
 const selectTeamLock = ref([]);
 const result = ref([]);
-const textLock=  ref(localStorage.getItem('player_lock')||'')
+const textLock=  ref('')
+const text = ref('');
+text.value = localStorage.getItem('player')||''
+textLock.value = localStorage.getItem('player_lock')||''
 const  playerLock = ref([])
 watch(
   () => text.value,
