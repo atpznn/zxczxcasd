@@ -34,20 +34,39 @@ function extractWords(text) {
   if (typeof text !== "string") {
     return [];
   }
-  const separatorRegex = /\d+\.\s*/g;
-  const parts = text.split(separatorRegex);
-  const words = parts.filter(Boolean).map((word) => word.trim());
-  return words;
+  const lines = text.trim().split('\n').filter(line => line.trim() !== '');
+    const nameRegex = /^(?:\d+\.?\s*)?([^\n]+)/;
+    let names = [];
+
+    for (const line of lines) {
+        const match = line.match(nameRegex);
+        if (match && match[1]) {
+            const name = match[1].trim();
+            if (name.length > 0 && isNaN(parseInt(name))) {
+                names.push(name);
+            }
+        }
+    }
+  return names;
 }
 const players = ref([]);
 const text = ref("");
 const select = ref([]);
+const selectTeamLock = ref([]);
 const result = ref([]);
+const textLock= ref('')
+const  playerLock = ref([])
 watch(
   () => text.value,
   () => {
     players.value = extractWords(text.value);
     select.value = players.value;
+  }
+);
+watch(
+  () => textLock.value,
+  () => {
+    playerLock.value = extractWords(textLock.value)
   }
 );
 function checkPlayer(player) {
@@ -57,16 +76,23 @@ function checkPlayer(player) {
     select.value.push(player);
   }
 }
+function checkPlayerTeamLock(player) {
+  if (selectTeamLock.value.some((s) => s == player)) {
+    selectTeamLock.value = selectTeamLock.value.filter((x) => x != player);
+  } else {
+    selectTeamLock.value.push(player);
+  }
+}
 function pair() {
-  result.value = [];
+  result.value = []
+  const resultPair = [];
   const { players, schedule } = pairer.getSet(select.value.length);
-  const sufflePair = shuffleInnerArrays(schedule);
   const idUserMap = players.map((x, index) => ({
     id: x,
     name: index >= select.value.length ? "" : select.value[index],
   }));
-
-  for (const set of sufflePair) {
+  
+  for (const set of schedule) {
     const _set = [];
     for (const team of set) {
       const player = [];
@@ -76,8 +102,17 @@ function pair() {
       }
       _set.push(player);
     }
-    result.value.push(_set);
+    resultPair.push(_set);
   }
+
+  for (const set of resultPair) {
+    let resultSet = set 
+    for (const lock of selectTeamLock.value) {
+      resultSet.push(lock.split(" "))
+    }
+    result.value.push(resultSet)
+  } 
+  result.value = shuffleInnerArrays(result.value);
 }
 </script>
 
@@ -98,6 +133,18 @@ function pair() {
         class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
         rows="5"
       ></textarea>
+       <label
+        for="players-input"
+        class="block text-sm font-medium text-gray-700 mb-1"
+      >
+        ใส่รายชื่อผู้เล่น (สำหรับล็อคคู่)
+      </label>
+       <textarea
+        v-model="textLock"
+        name="players-input"
+        class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        rows="5"
+      ></textarea>
     </div>
 
     <div class="mb-6">
@@ -113,6 +160,27 @@ function pair() {
             :id="`player-${player}`"
             :checked="select.some((s) => s == player)"
             @change="() => checkPlayer(player)"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label
+            :for="`player-${player}`"
+            class="flex-grow text-sm font-medium text-gray-700"
+          >
+            {{ player }}
+          </label>
+        </div>
+      </div>
+       <div class="grid grid-cols-1 gap-2 md:grid-cols-3 lg:grid-cols-4 mt-2">
+        <div
+          v-for="player in playerLock"
+          :key="player"
+          class="flex items-center space-x-2 bg-white p-3 rounded-lg shadow-sm"
+        >
+          <input
+            type="checkbox"
+            :id="`player-${player}`"
+            :checked="selectTeamLock.some((s) => s == player)"
+            @change="() => checkPlayerTeamLock(player)"
             class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
           />
           <label
