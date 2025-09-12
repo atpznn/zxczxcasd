@@ -50,22 +50,24 @@ function extractWords(text) {
   return names;
 }
 const players = ref([]);
-const text = ref("");
+const text = ref(localStorage.getItem('player')||'');
 const select = ref([]);
 const selectTeamLock = ref([]);
 const result = ref([]);
-const textLock= ref('')
+const textLock=  ref(localStorage.getItem('player_lock')||'')
 const  playerLock = ref([])
 watch(
   () => text.value,
   () => {
     players.value = extractWords(text.value);
+    localStorage.setItem('player',text.value)
     select.value = players.value;
   }
 );
 watch(
   () => textLock.value,
   () => {
+    localStorage.setItem('player_lock',textLock.value)
     playerLock.value = extractWords(textLock.value)
   }
 );
