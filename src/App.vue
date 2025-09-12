@@ -53,24 +53,32 @@ const players = ref([]);
 const select = ref([]);
 const selectTeamLock = ref([]);
 const result = ref([]);
-const textLock=  ref('')
-const text = ref('');
-text.value = localStorage.getItem('player')||''
-textLock.value = localStorage.getItem('player_lock')||''
+const textLock=  ref( localStorage.getItem('player_lock'))
+const text = ref( localStorage.getItem('player'));
+processTextPlayer()
+procesTextPlaterTeamLock()
+
 const  playerLock = ref([])
+function processTextPlayer(){
+  players.value = extractWords(text.value);
+  localStorage.setItem('player',text.value)
+  select.value = players.value;
+}
+function procesTextPlaterTeamLock(){
+  localStorage.setItem('player_lock',textLock.value)
+  playerLock.value = extractWords(textLock.value)
+  selectTeamLock.value = playerLock.value
+}
 watch(
   () => text.value,
   () => {
-    players.value = extractWords(text.value);
-    localStorage.setItem('player',text.value)
-    select.value = players.value;
+  processTextPlayer()
   }
 );
 watch(
   () => textLock.value,
   () => {
-    localStorage.setItem('player_lock',textLock.value)
-    playerLock.value = extractWords(textLock.value)
+  procesTextPlaterTeamLock()
   }
 );
 function checkPlayer(player) {
