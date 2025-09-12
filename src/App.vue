@@ -55,8 +55,7 @@ const selectTeamLock = ref([]);
 const result = ref([]);
 const textLock=  ref( localStorage.getItem('player_lock'))
 const text = ref( localStorage.getItem('player'));
-processTextPlayer()
-procesTextPlaterTeamLock()
+
 
 const  playerLock = ref([])
 function processTextPlayer(){
@@ -81,6 +80,8 @@ watch(
   procesTextPlaterTeamLock()
   }
 );
+processTextPlayer()
+procesTextPlaterTeamLock()
 function checkPlayer(player) {
   if (select.value.some((s) => s == player)) {
     select.value = select.value.filter((x) => x != player);
