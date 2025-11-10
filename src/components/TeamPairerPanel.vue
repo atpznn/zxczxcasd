@@ -85,40 +85,14 @@
 <script setup lang="ts">
 import { ref, watch, defineEmits, defineProps } from "vue";
 import useCreateTeamPair from "../composables/usePair";
+import { shuffleInnerArrays } from "../share";
 const pairer = useCreateTeamPair();
 const emit = defineEmits<{ onTeaming: (e: string[][]) => void }>();
 const props = defineProps<{
   text: string;
   textLock: string;
 }>();
-function shuffle(array) {
-  let currentIndex = array.length,
-    randomIndex;
 
-  while (currentIndex !== 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
-    ];
-  }
-
-  return array;
-}
-
-function shuffleInnerArrays(nestedList) {
-  if (!Array.isArray(nestedList)) {
-    throw new Error("Input must be an array.");
-  }
-  for (const innerArray of nestedList) {
-    if (Array.isArray(innerArray)) {
-      shuffle(innerArray);
-    }
-  }
-
-  return nestedList;
-}
 function extractWords(text) {
   if (typeof text !== "string") {
     return [];

@@ -1,38 +1,44 @@
 <script setup>
 import { reactive, ref } from "vue";
 import TeamPairerPanel from "./components/TeamPairerPanel.vue";
-const textOriginal = reactive({
-  text:localStorage.getItem("player")||'',
-  textLock:localStorage.getItem("player_lock")||''
-})
-const result = ref([])
-function shuffleInnerArrays(nestedList) {
-  if (!Array.isArray(nestedList)) {
-    throw new Error("Input must be an array.");
-  }
-  for (const innerArray of nestedList) {
-    if (Array.isArray(innerArray)) {
-      shuffle(innerArray);
-    }
-  }
+import { shuffleInnerArrays } from "./share";
 
-  return nestedList;
-}
-const show = ref(false)
+const textOriginal = reactive({
+  text: localStorage.getItem("player") || "",
+  textLock: localStorage.getItem("player_lock") || "",
+});
+const result = ref([]);
+
+const show = ref(false);
 </script>
 
 <template>
   <div class="p-4 bg-gray-100 min-h-screen font-sans text-gray-800">
     <h1 class="text-2xl font-bold mb-4 text-center">ตัวจับคู่ทีม</h1>
-    <TeamPairerPanel :text="textOriginal.text" :text-lock="textOriginal.textLock" @onTeaming="(e) => {result = e;show=true}"></TeamPairerPanel>
-    <div v-if="result.length!=0 && show">
+    <TeamPairerPanel
+      :text="textOriginal.text"
+      :text-lock="textOriginal.textLock"
+      @onTeaming="
+        (e) => {
+          result = e;
+          show = true;
+        }
+      "
+    ></TeamPairerPanel>
+    <!-- <div v-if="result.length != 0 && show">
       เพิ่มคู่มาทีหลัง
-      <TeamPairerPanel :text="''" :text-lock="''" @onTeaming="(e) => {
-        result.push(...e);
-        result = shuffleInnerArrays(result)
-        show=false
-        }"></TeamPairerPanel>
-    </div>
+      <TeamPairerPanel
+        :text="''"
+        :text-lock="''"
+        @onTeaming="
+          (e) => {
+            result = result.map((x) => [x, ...e.flatMap((x) => x)]);
+            result = shuffleInnerArrays(result);
+            show = false;
+          }
+        "
+      ></TeamPairerPanel>
+    </div> -->
     <div v-if="result.length > 0">
       <h2 class="text-xl font-semibold mb-2">ผลลัพธ์การจับคู่</h2>
       <div
